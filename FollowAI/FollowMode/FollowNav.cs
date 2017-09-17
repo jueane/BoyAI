@@ -2,15 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FollowNav : MonoBehaviour {
+public class FollowNav : IFollowStrategy {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public BoyAI ai;
+
+    public PlayerControl cat;
+
+    public BoyController boy;
+
+    public FollowNav(PlayerControl cat, BoyController boy)
+    {
+        ai = boy.ai;
+        this.cat = cat;
+        this.boy = boy;
+    }
+
+    public void Follow()
+    {
+    }
+
+    public void LookatCat()
+    {
+
+    }
 }

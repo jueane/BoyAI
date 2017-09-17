@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IFollowMode{
-
-
-
+public interface IFollowStrategy
+{
+    void Follow();
+    void LookatCat();
 }

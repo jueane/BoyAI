@@ -4,6 +4,12 @@ using UnityEngine;
 
 public interface IFollowStrategy
 {
+    //跟随
     void Follow();
-    void LookatCat();
+
+    //跟随方向【当前应该面朝的方向】【考虑需要向上跳的情况，要面朝台子】
+    bool IsToRight();
+
+    //到终点的剩余距离
+    float RemainDistance();
 }

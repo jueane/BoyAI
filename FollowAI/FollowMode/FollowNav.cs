@@ -21,8 +21,13 @@ public class FollowNav : IFollowStrategy {
     {
     }
 
-    public void LookatCat()
+    public bool IsToRight()
     {
+        return false;
+    }
 
+    public float RemainDistance()
+    {
+        return 0;
     }
 }

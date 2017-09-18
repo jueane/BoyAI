@@ -21,6 +21,9 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
 
     public FollowMode mode;
     public IFollowStrategy followStrategy;
+    private FollowCat followCat;
+    private FollowNav followNav;
+    private FollowPoint followPoint;
     public bool arrived = true;
     public Vector3 posTarget;
 
@@ -37,6 +40,10 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         boy = transform.GetComponent<BoyController>();
         pathDct = transform.GetComponent<DangerDetector>();
         jmpDct = transform.Find("JumpDetector").GetComponent<JumpDetector>();
+
+        followCat = new FollowCat(cat, boy);
+        followNav = new FollowNav(cat, boy);
+        followPoint = new FollowPoint(cat, boy);
 
         posTarget = Vector3.zero;
 
@@ -70,58 +77,21 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         if (enableSetTarget && boy.roleActionsControl.Player_RightTrigger.IsPressed && GameManager.Instance.playerIsDead == false)
         {
             arrived = false;
-            if (mode == FollowMode.FollowCat)
+            switch (mode)
             {
-                followStrategy = new FollowCat(cat, boy);
-            }
-            else if (mode == FollowMode.FollowNav)
-            {
-                followStrategy = new FollowNav(cat, boy);
-            }
-            else
-            {
-                followStrategy = new FollowPoint(cat, boy);
-            }
+                case FollowMode.FollowCat:
+                    followStrategy = followCat;
+                    break;
 
-            ////手动切换跟随模式
+                case FollowMode.FollowNav:
+                    followStrategy = followNav;
+                    break;
 
-            //if (mode == FollowMode.FollowCat)
-            //{
-            //    //目标是猫
-            //    arrived = false;
-            //}
-            //else
-            //{
-            //    //目标是点                
-            //    arrived = false;
-            //    posTarget = GameManager.Instance._cameraController.transform.position;
-            //}
-
+                case FollowMode.FollowPoint:
+                    followStrategy = followPoint;
+                    break;
+            }
         }
-
-        ////跟随猫模式
-        //if (mode == FollowMode.FollowCat && arrived == false)
-        //{
-        //    float disHor2 = Mathf.Abs(boy.transform.position.x - cat.transform.position.x);
-        //    if (disHor2 < minDis)
-        //    {
-        //        arrived = true;
-        //    }
-        //    else
-        //    {
-        //        posTarget = cat.transform.position;
-        //    }
-        //}
-
-        ////跟随点模式
-        //if (mode == FollowMode.FollowPoint && arrived == false)
-        //{
-        //    float disHor = Mathf.Abs(boy.transform.position.x - posTarget.x);
-        //    if (disHor < minDis)
-        //    {
-        //        arrived = true;
-        //    }
-        //}
 
         //可着力的情况下，小男孩能走，能停。
         if ((boy.groundCheck.IsOnGround() || boy.isFloating))
@@ -269,12 +239,7 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
 
     public bool IsFollowingRight()
     {
-        //if (boy.transform.position.x <= GameManager.Instance.Player.transform.position.x)
-        if (boy.transform.position.x <= posTarget.x)
-        {
-            return true;
-        }
-        return false;
+        return followStrategy.IsToRight();
     }
 
     public void PlayerDead()

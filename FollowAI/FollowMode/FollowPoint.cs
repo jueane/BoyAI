@@ -31,8 +31,17 @@ public class FollowPoint : IFollowStrategy
         }
     }
 
-    public void LookatCat()
+    public bool IsToRight()
     {
+        if (boy.transform.position.x <= ai.posTarget.x)
+        {
+            return true;
+        }
+        return false;
+    }
 
+    public float RemainDistance()
+    {
+        return 0;
     }
 }

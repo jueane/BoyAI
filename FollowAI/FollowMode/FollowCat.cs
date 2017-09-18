@@ -10,7 +10,7 @@ public class FollowCat : IFollowStrategy
 
     public BoyController boy;
 
-    public FollowCat(PlayerControl cat,BoyController boy)
+    public FollowCat(PlayerControl cat, BoyController boy)
     {
         ai = boy.ai;
         this.cat = cat;
@@ -43,11 +43,20 @@ public class FollowCat : IFollowStrategy
             }
 
         }
-        
+
     }
 
-    public void LookatCat()
+    public bool IsToRight()
     {
-        
+        if (boy.transform.position.x <= cat.transform.position.x)        
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public float RemainDistance()
+    {
+        return 0;
     }
 }

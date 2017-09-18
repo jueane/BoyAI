@@ -12,7 +12,7 @@ public class DangerDetector : MonoBehaviour
     public bool isDanger = false;
     public float slope;
     public bool passable;
-    public bool isFloating;
+    //public bool isFloating;
     public Vector3 normal;
     public GameObject hitObj;
 

@@ -10,11 +10,13 @@ public class FollowCat : IFollowStrategy
 
     public BoyController boy;
 
+    public float speed;
+
     public FollowCat(PlayerControl cat, BoyController boy)
     {
-        ai = boy.ai;
         this.cat = cat;
         this.boy = boy;
+        ai = boy.GetComponent<BoyAI>();
     }
 
     public void Follow()
@@ -26,29 +28,15 @@ public class FollowCat : IFollowStrategy
         }
         else
         {
-            ai.posTarget = cat.transform.position;
             //移动
-
-            float speedTemp = 1;
-
-            if (ai.IsFollowingRight())
-            {
-                boy.moveProc.SetMoveByAI(speedTemp);
-                ai.horSpeed = speedTemp;
-            }
-            else
-            {
-                boy.moveProc.SetMoveByAI(-speedTemp);
-                ai.horSpeed = -speedTemp;
-            }
-
+            boy.moveProc.SetMoveByAI(ai.speed);
         }
 
     }
 
     public bool IsToRight()
     {
-        if (boy.transform.position.x <= cat.transform.position.x)        
+        if (boy.transform.position.x <= cat.transform.position.x)
         {
             return true;
         }
@@ -57,6 +45,7 @@ public class FollowCat : IFollowStrategy
 
     public float RemainDistance()
     {
-        return 0;
+        float dis = Mathf.Abs(boy.transform.position.x - cat.transform.position.x);
+        return dis;
     }
 }

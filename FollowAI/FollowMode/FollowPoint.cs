@@ -10,30 +10,34 @@ public class FollowPoint : IFollowStrategy
 
     public BoyController boy;
 
+    public Vector3 posTarget;
+
     public FollowPoint(PlayerControl cat, BoyController boy)
     {
-        ai = boy.ai;
         this.cat = cat;
         this.boy = boy;
+        ai = boy.GetComponent<BoyAI>();
     }
 
     public void Follow()
     {
-        ai.posTarget = GameManager.Instance._cameraController.transform.position;
+        posTarget = GameManager.Instance._cameraController.transform.position;
 
-        float disHor = Mathf.Abs(boy.transform.position.x - ai.posTarget.x);
+        float disHor = Mathf.Abs(boy.transform.position.x - posTarget.x);
         if (disHor < ai.minDis)
         {
             ai.arrived = true;
         }
         else
         {
+            //移动
+            boy.moveProc.SetMoveByAI(ai.speed);
         }
     }
 
     public bool IsToRight()
     {
-        if (boy.transform.position.x <= ai.posTarget.x)
+        if (boy.transform.position.x <= posTarget.x)
         {
             return true;
         }
@@ -42,6 +46,7 @@ public class FollowPoint : IFollowStrategy
 
     public float RemainDistance()
     {
-        return 0;
+        float dis = Mathf.Abs(boy.transform.position.x - posTarget.x);
+        return dis;
     }
 }

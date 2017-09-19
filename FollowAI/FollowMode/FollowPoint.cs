@@ -21,7 +21,7 @@ public class FollowPoint : IFollowStrategy
 
     public void Follow()
     {
-        posTarget = GameManager.Instance._cameraController.transform.position;
+        //posTarget = GameManager.Instance._cameraController.transform.position;
 
         float disHor = Mathf.Abs(boy.transform.position.x - posTarget.x);
         if (disHor < ai.minDis)

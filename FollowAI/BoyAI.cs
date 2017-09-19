@@ -13,6 +13,8 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
 
     public NavManage nav;
 
+    public FollowPointsManage pointsManage;
+
     ////能否安全移动
     //public bool movable = true;
 
@@ -25,7 +27,7 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
     public IFollowStrategy followStrategy;
     private FollowCat followCat;
     private FollowNav followNav;
-    private FollowPoint followPoint;
+    public FollowPoint followPoint;
     public bool arrived = true;
     public float speed;
 
@@ -75,6 +77,10 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         if (nav.inNavmesh)
         {
             mode = FollowMode.FollowNav;
+        }
+        else if (pointsManage.inPointArea)
+        {
+            mode = FollowMode.FollowPoint;
         }
         else
         {
@@ -130,7 +136,7 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
             //follow执行完成之后，可能会变成arrived==true;所以不能使用else.
             if (arrived)
             {
-                StayThere();
+                StayThereAndLookAtCat();
             }
         }
     }
@@ -158,6 +164,12 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         this.horSpeed = speed;
     }
 
+    public void GotoPoint(Vector3 point)
+    {
+        followPoint.posTarget = point;
+        arrived = false;
+    }
+
     public void StayThere()
     {
         arrived = true;
@@ -168,7 +180,15 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
     public void StayThereAndLookAtCat()
     {
         StayThere();
+        if (mode == FollowMode.FollowCat)
+        {
+            StartCoroutine(LookAtCat());
+        }
+    }
 
+    IEnumerator LookAtCat()
+    {
+        yield return new WaitForSeconds(2);
         //静止时，自动面朝猫（1.5内不转身）
         float disHor2 = Mathf.Abs(boy.transform.position.x - cat.transform.position.x);
         if (disHor2 > 1.5f)

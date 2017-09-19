@@ -42,8 +42,9 @@ public class NavManage : MonoBehaviour
         if (inNavmesh)
         {
             //寻路
-            a = boy.transform.position + Vector3.up * 0.3f;
+            a = boy.transform.position + Vector3.up * 0.5f;
             b = cat.transform.position + Vector3.up * 0.3f;
+            mb.Init();
             pathList = mb.FindPath(a, b);
 
             //计算方向：上下左右

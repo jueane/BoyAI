@@ -242,7 +242,7 @@ public class MeshEditor : Editor
 
         for (int i = 0; i < vertsList.Count; i++)
         {
-            if (Vector3.Distance(vertsList[i], src) < HandleUtility.GetHandleSize(src) * minRadis)
+            if (Vector2.Distance(vertsList[i], src) < HandleUtility.GetHandleSize(src) * minRadis)
             {
                 return vertsList[i];
             }
@@ -265,7 +265,7 @@ public class MeshEditor : Editor
             for (int j = 0; j < countG; j++)
             {
                 Vector3 pos = child.GetChild(j).transform.position;
-                if (Vector3.Distance(pos, src) < HandleUtility.GetHandleSize(src) * minRadis)
+                if (Vector2.Distance(pos, src) < HandleUtility.GetHandleSize(src) * minRadis)
                 {
                     overlapList.Add(child.GetChild(j).gameObject);
                 }

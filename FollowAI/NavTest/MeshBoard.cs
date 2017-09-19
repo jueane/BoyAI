@@ -125,7 +125,7 @@ public class MeshBoard : MonoBehaviour
             {
                 if (node.nodeArr[j] != null)
                 {
-                    node.dis[j] = Vector3.Distance(node.center, node.nodeArr[j].center);
+                    node.dis[j] = Vector2.Distance(node.center, node.nodeArr[j].center);
                 }
             }
         }

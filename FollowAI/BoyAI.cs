@@ -11,6 +11,8 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
 
     JumpDetector jmpDct;
 
+    public NavManage nav;
+
     ////能否安全移动
     //public bool movable = true;
 
@@ -20,14 +22,19 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
     public bool enableSetTarget = true;
 
     public FollowMode mode;
+    public IFollowStrategy followStrategy;
+    private FollowCat followCat;
+    private FollowNav followNav;
+    private FollowPoint followPoint;
     public bool arrived = true;
-    public Vector3 posTarget;
+    public float speed;
 
     //输出小男孩的水平速度，仅观察用.
-    public float horSpeed = 1.5f;
+    public float horSpeed = 1;
 
     public float minDis = 2;
 
+    public float slowDis = 5;
 
     // Use this for initialization
     void Start()
@@ -37,7 +44,9 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         pathDct = transform.GetComponent<DangerDetector>();
         jmpDct = transform.Find("JumpDetector").GetComponent<JumpDetector>();
 
-        posTarget = Vector3.zero;
+        followCat = new FollowCat(cat, boy);
+        followNav = new FollowNav(cat, boy, nav);
+        followPoint = new FollowPoint(cat, boy);
 
         GameManager.Instance.AddRoleListener(this);
     }
@@ -56,167 +65,126 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         //enableFollow==false时小男孩停止
         if (boy.UseAI && enableFollow == false)
         {
-            //print("停止");
-            boy.moveProc.SetMoveByAI(0);
-            horSpeed = 0;
-            posTarget = Vector3.zero;
+            StayThere();
         }
 
     }
 
     void Process()
     {
-        //在力场中，跟随距离为0.5;
-        //if (boy.isFloating)
-        //{
-        //    minDis = 0.5f;
-        //}
-        //else
-        //{
-        //    minDis = 2;
-        //}
+        if (nav.inNavmesh)
+        {
+            mode = FollowMode.FollowNav;
+        }
+        else
+        {
+            mode = FollowMode.FollowCat;
+        }
 
         if (enableSetTarget && boy.roleActionsControl.Player_RightTrigger.IsPressed && GameManager.Instance.playerIsDead == false)
         {
-            //手动切换跟随模式
-
-            if (mode == FollowMode.FollowCat)
-            {
-                //目标是猫
-                arrived = false;
-            }
-            else
-            {
-                //目标是点                
-                arrived = false;
-                posTarget = GameManager.Instance._cameraController.transform.position;
-            }
-
-
-
-            //自动切换跟随模式
-
-            ////检查相机是否归位（要算上镜头偏移)
-            //Vector2 p1 = GameManager.Instance._cameraController.CameraOffset;
-            //Vector2 p2 = GameManager.Instance._cameraController._lastTargetPosition;
-            //Vector2 p3 = GameManager.Instance._cameraController._lastCameraPosition;
-
-            ////相机是否归位（前提是猫没有移动）
-            //bool cameraIsClosed = cat.moveProc.horizontalInputSpeed == 0 && Vector3.Distance(p1 + p2, p3) < 7f;
-
-            ////print("设置目标");
-            //if (cameraIsClosed)
-            //{
-            //    //目标是猫
-            //    mode = FollowMode.FollowCat;
-            //    arrived = false;
-            //}
-            //else
-            //{
-            //    //目标是点
-            //    mode = FollowMode.FollowPoint;
-            //    arrived = false;
-            //    posTarget = GameManager.Instance._cameraController.transform.position;
-            //}
-
+            arrived = false;
         }
-
-        //跟随猫模式
-        if (mode == FollowMode.FollowCat && arrived == false)
+        switch (mode)
         {
-            float disHor2 = Mathf.Abs(boy.transform.position.x - cat.transform.position.x);
-            if (disHor2 < minDis)
-            {
-                arrived = true;
-            }
-            else
-            {
-                posTarget = cat.transform.position;
-            }
+            case FollowMode.FollowCat:
+                followStrategy = followCat;
+                break;
+
+            case FollowMode.FollowNav:
+                followStrategy = followNav;
+                break;
+
+            case FollowMode.FollowPoint:
+                followStrategy = followPoint;
+                break;
         }
 
-        //跟随点模式
-        if (mode == FollowMode.FollowPoint && arrived == false)
-        {
-            float disHor = Mathf.Abs(boy.transform.position.x - posTarget.x);
-            if (disHor < minDis)
-            {
-                arrived = true;
-            }
-        }
-
-        //可着力的情况下才能改变小男孩的移动状态
+        //可着力的情况下，小男孩能走，能停。
         if ((boy.groundCheck.IsOnGround() || boy.isFloating))
         {
             //是否到达
             if (arrived == false)
             {
-                Follow();
-            }
-            else
-            {
-                posTarget = Vector3.zero;
-                boy.moveProc.SetMoveByAI(0);
-                this.horSpeed = 0;
+                //1.转身
+                AdjustDirection();
 
-                //静止时，自动面朝猫
-                float disHor2 = Mathf.Abs(boy.transform.position.x - cat.transform.position.x);
-                if (disHor2 > 1.5f)
+                //2.能移动
+                if (IsBoyMovable() && (pathDct.passable || boy.isFloating))
                 {
-                    if (boy.transform.position.x > cat.transform.position.x)
-                    {
-                        boy.moveProc.TurnByOrder(4);
-                    }
-                    else
-                    {
-                        boy.moveProc.TurnByOrder(6);
-                    }
-                }
-            }
-        }
-    }
-
-    void Follow()
-    {
-        if (AdjustDirection())
-        {
-            //print("步骤7" + "," + IsBoyMovable() + "," + pathDct.passable + "," + boy.isFloating);
-            if (IsBoyMovable() && (pathDct.passable || boy.isFloating))
-            {
-                //print("步骤8");
-                float speedTemp = 1;
-                //if (pathDct.isDanger)
-                //{
-                //    speedTemp = 0.3f;
-                //}
-
-                if (IsFollowingRight())
-                {
-                    boy.moveProc.SetMoveByAI(speedTemp);
-                    this.horSpeed = speedTemp;
+                    //设置速度
+                    SetSpeed();
+                    //跟随。
+                    followStrategy.Follow();
                 }
                 else
                 {
-                    boy.moveProc.SetMoveByAI(-speedTemp);
-                    this.horSpeed = -speedTemp;
+                    //3.不能移动，跳检测.成功则跳。失败则设置已到达。（刚进力场时，boy.groundCheck.IsOnGround()经常为true，导致boy不跟随，垂直下落）
+                    if (boy.groundCheck.IsOnGround() && boy.isFloating == false && boy.moveProc.CanMoveFreely)
+                    {
+                        //print("尝试跳" + boy.groundCheck.IsOnGround());
+                        TryJump();
+                    }
                 }
             }
-            else
+            //follow执行完成之后，可能会变成arrived==true;所以不能使用else.
+            if (arrived)
             {
-                //不能移动，先停下，尝试跳过。还要判断是否僵直canMoveFreely.
-                if ((boy.groundCheck.IsOnGround() || boy.isFloating) && boy.moveProc.CanMoveFreely)
-                {
-                    //先停下
-                    boy.moveProc.SetMoveByAI(0);
-                    this.horSpeed = 0;
-                    //再尝试跳
-                    TryJump();
-                }
+                StayThere();
             }
         }
     }
 
-    //判断方向正确。
+    //设置速度
+    void SetSpeed()
+    {
+        speed = 1;
+        //计算速度
+        float remainDis = followStrategy.RemainDistance();
+        if (remainDis < slowDis)
+        {
+            //speed = remainDis / slowDis;
+            speed = (remainDis - minDis) / (slowDis - minDis);
+            if (speed < 0.3)
+            {
+                speed = 0.3f;
+            }
+        }
+
+        if (IsFollowingRight() == false)
+        {
+            speed = -Mathf.Abs(speed);
+        }
+        this.horSpeed = speed;
+    }
+
+    public void StayThere()
+    {
+        arrived = true;
+        boy.moveProc.SetMoveByAI(0);
+        this.horSpeed = 0;
+    }
+
+    public void StayThereAndLookAtCat()
+    {
+        StayThere();
+
+        //静止时，自动面朝猫（1.5内不转身）
+        float disHor2 = Mathf.Abs(boy.transform.position.x - cat.transform.position.x);
+        if (disHor2 > 1.5f)
+        {
+            if (boy.transform.position.x > cat.transform.position.x)
+            {
+                boy.moveProc.TurnByOrder(4);
+            }
+            else
+            {
+                boy.moveProc.TurnByOrder(6);
+            }
+        }
+    }
+
+    //面朝前进方向。
     bool AdjustDirection()
     {
         //方向是否一致
@@ -226,9 +194,6 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         }
         else
         {
-            //方向不同，则先转身。
-            //boy.SetMoveByAI(0);
-            //this.horSpeed = 0;
             if (IsFollowingRight())
             {
                 boy.moveProc.TurnByOrder(6);
@@ -266,19 +231,13 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         else
         {
             //不能执行的命令，取消掉。（防止切换世界之后，跑到在原来世界定的坐标点）
-            //posTarget = Vector3.zero;
             arrived = true;
         }
     }
 
     public bool IsFollowingRight()
     {
-        //if (boy.transform.position.x <= GameManager.Instance.Player.transform.position.x)
-        if (boy.transform.position.x <= posTarget.x)
-        {
-            return true;
-        }
-        return false;
+        return followStrategy.IsToRight();
     }
 
     public void PlayerDead()
@@ -289,7 +248,7 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
 
     public void PlayerRespawn()
     {
-        posTarget = Vector3.zero;
+        StayThere();
     }
 }
 

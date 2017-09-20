@@ -3,6 +3,8 @@ using System.Collections;
 
 public class BoyAI : MonoBehaviour, GameManagerRoleListener
 {
+    public bool debug;
+
     public PlayerControl cat;
 
     public BoyController boy;

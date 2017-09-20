@@ -130,7 +130,10 @@ public class DangerDetector : MonoBehaviour
 
         bool isHit = Physics.Raycast(originPoint, Vector3.down, out hit, 20, interestLayer);
 
-        Debug.DrawRay(originPoint, Vector3.down * 20, Color.blue);
+        if (ai.debug)
+        {
+            Debug.DrawRay(originPoint, Vector3.down * 20, Color.blue);
+        }
 
         if (isHit)
         {
@@ -188,7 +191,10 @@ public class DangerDetector : MonoBehaviour
 
         bool isHit2 = Physics.Raycast(originPoint + new Vector3(0.5f, 0, 0), Vector3.down, out hit2, 20, interestLayer);
 
-        Debug.DrawRay(originPoint + new Vector3(0.5f, 0, 0), Vector3.down * 20, Color.blue);
+        if (ai.debug)
+        {
+            Debug.DrawRay(originPoint + new Vector3(0.5f, 0, 0), Vector3.down * 20, Color.blue);
+        }
 
         if (isHit2)
         {

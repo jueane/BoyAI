@@ -146,9 +146,9 @@ public class JumpDetectorBody : MonoBehaviour
         //经测试，Init放到start里边不能及时执行。因为此对象是在一帧间隔中创建，会在这帧的Update最后（LateUpate之前）调用start。
         ai = GameManager.Instance.boy.GetComponent<BoyAI>();
 
-        interestingLayer = LayerMask.GetMask("ground", "Platform", "Danger", "Default", "Floating");
-        layerCollision = LayerMask.GetMask("ground", "Platform");
-        layerGround = LayerMask.GetMask("ground");
+        interestingLayer = LayerMask.GetMask(LayerName.ground, LayerName.Platform, LayerName.Danger, LayerName.Default, LayerName.Floating);
+        layerCollision = LayerMask.GetMask(LayerName.ground, LayerName.Platform);
+        layerGround = LayerMask.GetMask(LayerName.ground);
     }
 
     // Update is called once per frame
@@ -208,13 +208,13 @@ public class JumpDetectorBody : MonoBehaviour
         for (int i = 0; i < cArr.Length; i++)
         {
             Collider c = cArr[i];
-            if (c.gameObject.layer == LayerMask.NameToLayer("Danger"))
+            if (c.gameObject.layer == LayerMask.NameToLayer(LayerName.Danger))
             {
                 collideType = 1;
                 collideDanger = true;
             }
 
-            if (c.gameObject.layer == LayerMask.NameToLayer("Floating"))
+            if (c.gameObject.layer == LayerMask.NameToLayer(LayerName.Floating))
             {
                 collideType = 2;
                 collideSecure = true;

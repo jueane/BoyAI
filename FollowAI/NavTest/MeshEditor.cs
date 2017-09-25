@@ -55,25 +55,8 @@ public class MeshEditor : Editor
     {
         int controlID = GUIUtility.GetControlID(FocusType.Passive);
         HandleUtility.AddDefaultControl(controlID);
-
-
+        
         Event e = Event.current;
-        //if (e.type == EventType.mouseUp && e.button == 0)
-        //{
-        //    if (e.control)
-        //    {
-        //        Debug.Log(1);
-        //    }
-        //}
-        //if (e.control && e.type == EventType.keyUp && e.keyCode == KeyCode.Q)
-        //{
-        //    Debug.Log(2);
-        //}
-
-        //if (e.type == EventType.mouseUp && e.shift && e.button == 1)
-        //{
-        //    Debug.Log("redraw");
-        //}
 
         mb.Init();
 
@@ -81,7 +64,7 @@ public class MeshEditor : Editor
         if (isEditing && e.type == EventType.mouseDown && e.button == 0)
         {
             Ray r = UnityEditor.HandleUtility.GUIPointToWorldRay(e.mousePosition);
-            Vector3 posRes = new Vector3(r.origin.x, r.origin.y, 0);
+            Vector2 posRes = new Vector2(r.origin.x, r.origin.y);
 
             posRes = GetOverlapPoint(posRes);
 
@@ -105,9 +88,9 @@ public class MeshEditor : Editor
         {
             //Debug.Log("选中");
             Ray r = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-            Vector3 posRes = new Vector3(r.origin.x, r.origin.y, 0);
+            Vector2 posRes = new Vector2(r.origin.x, r.origin.y);
             //获取重叠点
-            Vector3 overPos = GetOverlapPoint(posRes);
+            Vector2 overPos = GetOverlapPoint(posRes);
             hd = overPos;
             if (overPos == posRes)
             {
@@ -166,12 +149,12 @@ public class MeshEditor : Editor
             Transform child = obj.transform.GetChild(i);
 
             int countG = child.childCount;
-            Vector3[] verts = new Vector3[countG];
+            Vector2[] verts = new Vector2[countG];
 
             List<Vector3> posList = new List<Vector3>();
             for (int j = 0; j < countG; j++)
             {
-                Vector3 pos = child.GetChild(j).transform.position;
+                Vector2 pos = child.GetChild(j).transform.position;
                 posList.Add(pos);
 
                 //标记顶点
@@ -236,9 +219,9 @@ public class MeshEditor : Editor
     }
 
     //取重合点
-    private Vector3 GetOverlapPoint(Vector3 src)
+    private Vector2 GetOverlapPoint(Vector3 src)
     {
-        List<Vector3> vertsList = mb.vertsList;
+        List<Vector2> vertsList = mb.vertsList;
 
         for (int i = 0; i < vertsList.Count; i++)
         {

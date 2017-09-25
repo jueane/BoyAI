@@ -5,9 +5,8 @@ using System.Collections.Generic;
 public class JumpDetectorBody : MonoBehaviour
 {
     public bool showLine;
-    
+
     BoyAI ai;
-    public Vector3 boyColliderSize;
     //模拟碰撞用的地面，危险，浮空等层。
     int interestingLayer;
 
@@ -22,7 +21,7 @@ public class JumpDetectorBody : MonoBehaviour
     public int collideType;
 
     Vector3 centerOffset = Vector3.up;
-    
+
     //帧间隔
     float deltaTime = 0.033f;
 
@@ -147,7 +146,6 @@ public class JumpDetectorBody : MonoBehaviour
         //经测试，Init放到start里边不能及时执行。因为此对象是在一帧间隔中创建，会在这帧的Update最后（LateUpate之前）调用start。
         ai = GameManager.Instance.boy.GetComponent<BoyAI>();
 
-        boyColliderSize = new Vector3(0.72f, 2, 1);
         interestingLayer = LayerMask.GetMask("ground", "Platform", "Danger", "Default", "Floating");
         layerCollision = LayerMask.GetMask("ground", "Platform");
         layerGround = LayerMask.GetMask("ground");
@@ -160,7 +158,6 @@ public class JumpDetectorBody : MonoBehaviour
 
     public void Jump(float speed)
     {
-        boyColliderSize = new Vector3(0.72f, 2, 1);
         wantJump = true;
         state = BoyState.Raising;
         horizontalInputSpeed = speed;
@@ -203,7 +200,7 @@ public class JumpDetectorBody : MonoBehaviour
     void CollideSimulate()
     {
 
-        Collider[] cArr = Physics.OverlapBox(transform.position, boyColliderSize / 2, Quaternion.identity, interestingLayer);
+        Collider[] cArr = Physics.OverlapBox(transform.position, ai.boy.ColliderSize / 1.8f, Quaternion.identity, interestingLayer);
 
         bool collideDanger = false;
         bool collideSecure = false;

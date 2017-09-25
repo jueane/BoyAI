@@ -6,7 +6,7 @@ public class MeshBoard : MonoBehaviour
 {
     public Material mat;
 
-    public List<Vector3> vertsList = new List<Vector3>();
+    public List<Vector2> vertsList = new List<Vector2>();
 
     public List<NavTriangle> triangleList = new List<NavTriangle>();
 
@@ -81,10 +81,10 @@ public class MeshBoard : MonoBehaviour
             Vector3[] verts = new Vector3[child.childCount];
             int countG = child.childCount;
 
-            List<Vector3> posList = new List<Vector3>();
+            List<Vector2> posList = new List<Vector2>();
             for (int j = 0; j < countG; j++)
             {
-                Vector3 pos = child.GetChild(j).transform.position;
+                Vector2 pos = child.GetChild(j).transform.position;
                 posList.Add(pos);
             }
 

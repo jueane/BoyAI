@@ -3,9 +3,11 @@ using System.Collections;
 
 public class DangerDetector : MonoBehaviour
 {
+    public bool debug;
+
     BoyAI ai;
     int interestLayer;
-
+    public LayerMask layer;
     public Collider[] cArr;
     public float passHeight;
     public bool existPath;
@@ -20,12 +22,7 @@ public class DangerDetector : MonoBehaviour
     void Start()
     {
         ai = GameManager.Instance.boy.GetComponent<BoyAI>();
-        interestLayer = LayerMask.GetMask("ground", "Platform", "Danger", "Floating");
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
+        interestLayer = LayerMask.GetMask(LayerName.ground, LayerName.Platform, LayerName.Danger, LayerName.Floating);
     }
 
     public void UpdateByParent()
@@ -92,7 +89,7 @@ public class DangerDetector : MonoBehaviour
             {
                 for (int j = 0; j < cArr.Length; j++)
                 {
-                    if (LayerMask.NameToLayer("Floating").Equals(cArr[j].gameObject.layer))
+                    if (LayerMask.NameToLayer(LayerName.Floating).Equals(cArr[j].gameObject.layer))
                     {
                         passHeight = 0;
                         existPath = true;
@@ -130,7 +127,7 @@ public class DangerDetector : MonoBehaviour
 
         bool isHit = Physics.Raycast(originPoint, Vector3.down, out hit, 20, interestLayer);
 
-        if (ai.debug)
+        if (debug)
         {
             Debug.DrawRay(originPoint, Vector3.down * 20, Color.blue);
         }
@@ -140,7 +137,7 @@ public class DangerDetector : MonoBehaviour
             this.hitObj = hit.collider.gameObject;
             this.normal = hit.normal;
             this.slope = GetSlope(hit.normal);
-            if (hit.collider && hit.collider.gameObject.layer == LayerMask.NameToLayer("Danger"))
+            if (hit.collider && hit.collider.gameObject.layer == LayerMask.NameToLayer(LayerName.Danger))
             {
                 isDanger = true;
             }
@@ -191,7 +188,7 @@ public class DangerDetector : MonoBehaviour
 
         bool isHit2 = Physics.Raycast(originPoint + new Vector3(0.5f, 0, 0), Vector3.down, out hit2, 20, interestLayer);
 
-        if (ai.debug)
+        if (debug)
         {
             Debug.DrawRay(originPoint + new Vector3(0.5f, 0, 0), Vector3.down * 20, Color.blue);
         }
@@ -201,7 +198,7 @@ public class DangerDetector : MonoBehaviour
             this.hitObj = hit2.collider.gameObject;
             this.normal = hit2.normal;
             this.slope = GetSlope(hit2.normal);
-            if (hit2.collider && hit2.collider.gameObject.layer == LayerMask.NameToLayer("Danger"))
+            if (hit2.collider && hit2.collider.gameObject.layer == LayerMask.NameToLayer(LayerName.Danger))
             {
                 isDanger = true;
             }

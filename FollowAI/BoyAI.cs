@@ -3,15 +3,13 @@ using System.Collections;
 
 public class BoyAI : MonoBehaviour, GameManagerRoleListener
 {
-    public bool debug;
-
     public PlayerControl cat;
 
     public BoyController boy;
 
-    public DangerDetector pathDct;
+    public DangerDetector dangerDct;
 
-    JumpDetector jmpDct;
+    public JumpDetector jmpDct;
 
     public NavManage nav;
 
@@ -45,7 +43,7 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
     {
         cat = GameManager.Instance.Player;
         boy = transform.GetComponent<BoyController>();
-        pathDct = transform.GetComponent<DangerDetector>();
+        dangerDct = transform.GetComponent<DangerDetector>();
         jmpDct = transform.Find("JumpDetector").GetComponent<JumpDetector>();
 
         followCat = new FollowCat(cat, boy);
@@ -59,7 +57,7 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
     void Update()
     {
         //无论是否用AI，都要调用DangerDct
-        pathDct.UpdateByParent();
+        dangerDct.UpdateByParent();
 
         if (boy.UseAI && enableFollow)
         {
@@ -118,7 +116,7 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
                 AdjustDirection();
 
                 //2.能移动
-                if (IsBoyMovable() && (pathDct.passable || boy.isFloating))
+                if (IsBoyMovable() && (dangerDct.passable || boy.isFloating))
                 {
                     //设置速度
                     SetSpeed();

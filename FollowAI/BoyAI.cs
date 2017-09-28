@@ -23,6 +23,7 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
     //启用设置目标功能
     public bool enableSetTarget = true;
 
+    //策略模式实现
     public FollowMode mode;
     public IFollowStrategy followStrategy;
     private FollowCat followCat;

@@ -30,7 +30,7 @@ public class FollowNav : IFollowStrategy
         else
         {
             //移动
-            if (Mathf.Abs(nav.pathList[1].x - nav.pathList[0].x) < 0.1f)
+            if (Mathf.Abs(nav.pathList[1].x - nav.pathList[0].x) < 0.3f)
             {
                 boy.moveProc.SetMoveByAI(0);
             }

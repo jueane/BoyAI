@@ -245,7 +245,7 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         jmpDct.Detect();
         if (jmpDct.jumpable)
         {
-            boy.jumpProc.JumpByAI();
+            boy.jumpProc.JumpByAI(jmpDct.isClimbWallTrigger);
             boy.moveProc.SetMoveByAI(jmpDct.bestSpeed);
             this.horSpeed = jmpDct.bestSpeed;
         }

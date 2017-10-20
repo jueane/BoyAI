@@ -25,6 +25,8 @@ public class JumpDetector : MonoBehaviour
     public int surviveCount;
     public bool jumpable;
     public float bestSpeed;
+    //碰到翻墙点标记(用于放球后跳)
+    public bool isClimbWallTrigger;
 
     //检测体自动编号
     int number = 0;
@@ -35,15 +37,6 @@ public class JumpDetector : MonoBehaviour
         ai = GameManager.Instance.boy.GetComponent<BoyAI>();
         jd = transform.parent.Find("JumpDetectorBody").GetComponent<JumpDetectorBody>();
         tempMother = GameManager.Instance.temp.transform;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        //if (Input.GetKey(KeyCode.J))
-        //{
-        //    Detect();
-        //}
     }
 
     //执行一次检测（外部调用）
@@ -97,7 +90,7 @@ public class JumpDetector : MonoBehaviour
 
         for (int i = 0; i < dctBodyArr.Length; i++)
         {
-            JumpDetectorBody jdTemp = Instantiate<JumpDetectorBody>(jd);
+            JumpDetectorBody jdTemp = Instantiate(jd);
             jdTemp.name = "jd" + number++;
             jdTemp.transform.position = ai.boy.transform.position + Vector3.up;
             jdTemp.transform.SetParent(this.tempMother);
@@ -117,7 +110,7 @@ public class JumpDetector : MonoBehaviour
                 jdTemp.Jump(-speedTmp);
             }
 
-            dctBodyArr[i] = jdTemp;
+            dctBodyArr[i] = jdTemp;            
         }
 
     }
@@ -151,8 +144,8 @@ public class JumpDetector : MonoBehaviour
             //找出最优跳跃速度
             //bestSpeed = dctBodyList[(dctBodyList.Count-1)/2].usedSpeed;
             bestSpeed = dctBodyList[0].usedSpeed;
-
-
+            //标记是否翻墙点
+            isClimbWallTrigger = dctBodyList[0].isClimbWallTrigger;
             jumpable = true;
         }
         else

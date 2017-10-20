@@ -22,6 +22,9 @@ public class JumpDetectorBody : MonoBehaviour
 
     Vector3 centerOffset = Vector3.up;
 
+    //碰到翻墙点标记(用于支持放球跳)
+    public bool isClimbWallTrigger;
+
     //帧间隔
     float deltaTime = 0.033f;
 
@@ -150,12 +153,7 @@ public class JumpDetectorBody : MonoBehaviour
         layerCollision = LayerMask.GetMask(LayerName.ground, LayerName.Platform);
         layerGround = LayerMask.GetMask(LayerName.ground);
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-    }
-
+    
     public void Jump(float speed)
     {
         wantJump = true;
@@ -167,7 +165,7 @@ public class JumpDetectorBody : MonoBehaviour
         for (int i = 0; i < 100; i++)
         {
             //危险和安全机关算是collided，地形不算collided.
-            if (this.isCollided)
+            if (isCollided)
             {
                 break;
             }
@@ -199,11 +197,13 @@ public class JumpDetectorBody : MonoBehaviour
     //碰撞模拟
     void CollideSimulate()
     {
-
         Collider[] cArr = Physics.OverlapBox(transform.position, ai.boy.ColliderSize / 1.8f, Quaternion.identity, interestingLayer);
 
         bool collideDanger = false;
         bool collideSecure = false;
+
+        //先初始化值
+        isClimbWallTrigger = false;
 
         for (int i = 0; i < cArr.Length; i++)
         {
@@ -227,18 +227,21 @@ public class JumpDetectorBody : MonoBehaviour
                 {
                     collideType = 3;
                     collideSecure = true;
+                    //标记
+                    isClimbWallTrigger = true;
                 }
             }
 
-            Ladder ladder = c.GetComponent<Ladder>();
-            if (ladder && Mathf.Abs(c.transform.position.x - ladder.transform.position.x) < ladder.PlayerClimbDis)
-            {
-                if ((ladder.ClimbingDirection == 6 && ai.IsFollowingRight()) || ladder.ClimbingDirection == 4 && ai.IsFollowingRight() == false)
-                {
-                    collideType = 4;
-                    collideSecure = true;
-                }
-            }
+            //梯子:已经移除
+            //Ladder ladder = c.GetComponent<Ladder>();
+            //if (ladder && Mathf.Abs(c.transform.position.x - ladder.transform.position.x) < ladder.PlayerClimbDis)
+            //{
+            //    if ((ladder.ClimbingDirection == 6 && ai.IsFollowingRight()) || ladder.ClimbingDirection == 4 && ai.IsFollowingRight() == false)
+            //    {
+            //        collideType = 4;
+            //        collideSecure = true;
+            //    }
+            //}
 
             TransferDoor door = c.GetComponent<TransferDoor>();
             if (door)

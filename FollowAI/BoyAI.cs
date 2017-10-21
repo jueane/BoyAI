@@ -165,9 +165,17 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         this.horSpeed = speed;
     }
 
+    //走到指定点
     public void GotoPoint(Vector3 point)
     {
         followPoint.posTarget = point;
+        arrived = false;
+    }
+
+    //走到猫身边
+    public void GoToCat()
+    {
+        mode = FollowMode.FollowCat;
         arrived = false;
     }
 

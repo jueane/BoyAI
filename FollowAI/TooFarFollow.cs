@@ -41,7 +41,6 @@ public class TooFarFollow : MonoBehaviour
     //检测一次是否需要[过远跟随]
     void Detect()
     {
-        print("过远跟随");
         if (Vector2.Distance(boy.position, cat.position) > minDis)
         {
             ai.GoToCat();

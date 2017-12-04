@@ -149,9 +149,9 @@ public class JumpDetectorBody : MonoBehaviour
         //经测试，Init放到start里边不能及时执行。因为此对象是在一帧间隔中创建，会在这帧的Update最后（LateUpate之前）调用start。
         ai = GameManager.Instance.boy.GetComponent<BoyAI>();
 
-        interestingLayer = LayerMask.GetMask(LayerName.ground, LayerName.Platform, LayerName.Danger, LayerName.Default, LayerName.Floating);
-        layerCollision = LayerMask.GetMask(LayerName.ground, LayerName.Platform);
-        layerGround = LayerMask.GetMask(LayerName.ground);
+        interestingLayer = LayerMask.GetMask(LayerName.Ground, LayerName.Platform, LayerName.Danger, LayerName.Default, LayerName.Floating);
+        layerCollision = LayerMask.GetMask(LayerName.Ground, LayerName.Platform);
+        layerGround = LayerMask.GetMask(LayerName.Ground);
     }
     
     public void Jump(float speed)

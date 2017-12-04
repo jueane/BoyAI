@@ -19,8 +19,8 @@ public class AIPoint : MonoBehaviour
 
     void OnTriggerEnter(Collider c)
     {
-        bool condition1 = trigger == TriggerMode.cat && "Player".Equals(c.tag);
-        bool condition2 = trigger == TriggerMode.boy && "Player2".Equals(c.tag);
+        bool condition1 = trigger == TriggerMode.cat && TagName.Player.Equals(c.tag);
+        bool condition2 = trigger == TriggerMode.boy && TagName.Player2.Equals(c.tag);
         if (condition1 || condition2)
         {
             StartCoroutine(DoAction());

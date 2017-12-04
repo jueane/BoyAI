@@ -21,13 +21,6 @@ public class MeshBoard : MonoBehaviour
         turnPointCalc = new TurnPointCalculator();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        //Init();
-        //FindPath(a.position, b.position);
-    }
-
     public void Init()
     {
         //设置所有顶点
@@ -90,7 +83,6 @@ public class MeshBoard : MonoBehaviour
 
             vertsList.AddRange(posList);
             //设置各节点的顶点
-
             for (int k = 0; k < posList.Count - 2; k++)
             {
                 //保存节点信息

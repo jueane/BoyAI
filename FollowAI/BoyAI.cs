@@ -79,14 +79,14 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         {
             mode = FollowMode.FollowNav;
         }
-        else if (pointsManage.inPointArea)
-        {
-            mode = FollowMode.FollowPoint;
-        }
-        else
-        {
-            mode = FollowMode.FollowCat;
-        }
+        //else if (pointsManage.inPointArea)
+        //{
+        //    mode = FollowMode.FollowPoint;
+        //}
+        //else
+        //{
+        //    mode = FollowMode.FollowCat;
+        //}
 
         if (enableSetTarget && boy.roleActionsControl.Player_RightTrigger.IsPressed && GameManager.Instance.playerIsDead == false)
         {

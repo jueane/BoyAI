@@ -18,15 +18,10 @@ public class NavManage : MonoBehaviour
 
     public Vector2 direction;
 
-    // Use this for initialization
-    void Start()
-    {
-    }
-
     // Update is called once per frame
     void Update()
     {
-        Collider[] cList = Physics.OverlapBox(boy.position, boy.GetComponent<BoxCollider>().bounds.extents, Quaternion.identity, LayerMask.GetMask("NavMesh"));
+        Collider[] cList = Physics.OverlapBox(boy.position, boy.GetComponent<BoxCollider>().bounds.extents, Quaternion.identity, LayerMask.GetMask(LayerName.NavMesh));
         //判断是否在navmesh中
         if (cList != null && cList.Length != 0)
         {
@@ -49,13 +44,6 @@ public class NavManage : MonoBehaviour
 
             //计算方向：上下左右
             direction = pathList[1] - pathList[0];
-        }
-
-        //临时
-        if (Input.GetKey(KeyCode.T))
-        {
-            Vector3 pos = GameManager.Instance.Player.transform.position = new Vector3(1544.39f, -30.73f, 5);
-            GameManager.Instance.boy.transform.position = pos;
         }
     }
 }

@@ -7,7 +7,7 @@ public class DangerDetector : MonoBehaviour
 
     BoyAI ai;
     int interestLayer;
-    public LayerMask layer;
+
     public Collider[] cArr;
     public float passHeight;
     public bool existPath;
@@ -22,7 +22,7 @@ public class DangerDetector : MonoBehaviour
     void Start()
     {
         ai = GameManager.Instance.boy.GetComponent<BoyAI>();
-        interestLayer = LayerMask.GetMask(LayerName.ground, LayerName.Platform, LayerName.Danger, LayerName.Floating);
+        interestLayer = LayerMask.GetMask(LayerName.Ground, LayerName.Platform, LayerName.Danger, LayerName.Floating);
     }
 
     public void UpdateByParent()
@@ -242,8 +242,8 @@ public class DangerDetector : MonoBehaviour
     //        offset = -0.8f;
     //    }
 
-    //    bool isA = Physics.CheckBox(transform.position + Vector3.up, new Vector3(1, 2, 1), Quaternion.identity, LayerMask.GetMask("Floating"));
-    //    bool isB = Physics.CheckBox(transform.position + Vector3.up + new Vector3(offset, 0, 0), new Vector3(1, 2, 1), Quaternion.identity, LayerMask.GetMask("Floating"));
+    //    bool isA = Physics.CheckBox(transform.position + Vector3.up, new Vector3(1, 2, 1), Quaternion.identity, LayerMask.GetMask(LayerName.Floating));
+    //    bool isB = Physics.CheckBox(transform.position + Vector3.up + new Vector3(offset, 0, 0), new Vector3(1, 2, 1), Quaternion.identity, LayerMask.GetMask(LayerName.Floating));
     //    isFloating = isA | isB;
     //    return isA || isB;
     //}

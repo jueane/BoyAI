@@ -218,7 +218,7 @@ public class MeshEditor : Editor
         obj.gameObject.GetComponent<MeshFilter>().mesh = mesh;
         obj.gameObject.GetComponent<MeshRenderer>().material = mb.mat;
     }
-
+    
     //取重合点
     private Vector2 GetOverlapPoint(Vector3 src)
     {

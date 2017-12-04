@@ -66,7 +66,7 @@ public class AIPoint : MonoBehaviour
 
     void End()
     {
-        ai.mode = FollowMode.FollowCat;
+        ai.mode = FollowMode.FollowTarget;
     }
 
 }

@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//BoyAI有三种跟随方法：1.跟随点（走到指定位置点）；2.跟随对象；3.按向量移动。
+//需要停止跟随，并不再响应跟随指令，调用DisableFollow()方法或设置enableFollow = false即可，推荐前者。
+//需要停止跟随，但可以响应跟随指令，调用StayThere()即可。
 public class BoyAI : MonoBehaviour, GameManagerRoleListener
 {
     public PlayerControl cat;
@@ -20,17 +23,27 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
 
     //启用跟随
     public bool enableFollow = true;
-    //启用设置目标功能
-    public bool enableSetTarget = true;
 
-    //策略模式实现
+    //开启导航
+    public bool enableNav;
+
+    //跟随模式
     public FollowMode mode;
-    public IFollowStrategy followStrategy;
-    private FollowCat followCat;
-    private FollowNav followNav;
-    public FollowPoint followPoint;
     public bool arrived = true;
     public float speed;
+
+    //策略
+    public IFollowStrategy followStrategy;
+    public FollowNav followNav;
+    public FollowPoint followPoint;
+
+    //跟随点
+    public Vector3 targetPoint;
+    //跟随目标
+    public Transform targetTransfrom;
+    //按向量移动
+    public Vector3 vec;
+
 
     //输出小男孩的水平速度，仅观察用.
     public float horSpeed = 1;
@@ -47,9 +60,8 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         dangerDct = transform.GetComponent<DangerDetector>();
         jmpDct = transform.Find("JumpDetector").GetComponent<JumpDetector>();
 
-        followCat = new FollowCat(cat, boy);
-        followNav = new FollowNav(cat, boy, nav);
-        followPoint = new FollowPoint(cat, boy);
+        followNav = new FollowNav(boy, nav);
+        followPoint = new FollowPoint(boy);
 
         GameManager.Instance.AddRoleListener(this);
     }
@@ -60,61 +72,69 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         //无论是否用AI，都要调用DangerDct
         dangerDct.UpdateByParent();
 
-        if (boy.UseAI && enableFollow)
+        if (boy.UseAI)
         {
-            Process();
-        }
+            //召唤指令
+            if (GameManager.Instance.playerIsDead == false && boy.roleActionsControl.Player_RightTrigger.IsPressed)
+            {
+                FollowTarget(cat.gameObject);
+            }
 
-        //enableFollow==false时小男孩停止
-        if (boy.UseAI && enableFollow == false)
-        {
-            StayThere();
+            //处理跟随
+            if (enableFollow)
+            {
+                Processing();
+            }
+
+            //enableFollow==false时小男孩停止
+            if (enableFollow == false)
+            {
+                StayThere();
+            }
+
         }
 
     }
 
-    void Process()
+
+    void Processing()
     {
+        //是否开启导航
         if (nav.inNavmesh)
         {
-            mode = FollowMode.FollowNav;
+            followStrategy = followNav;
         }
-        //else if (pointsManage.inPointArea)
-        //{
-        //    mode = FollowMode.FollowPoint;
-        //}
-        //else
-        //{
-        //    mode = FollowMode.FollowCat;
-        //}
-
-        if (enableSetTarget && boy.roleActionsControl.Player_RightTrigger.IsPressed && GameManager.Instance.playerIsDead == false)
+        else
         {
-            arrived = false;
-        }
-        switch (mode)
-        {
-            case FollowMode.FollowCat:
-                followStrategy = followCat;
-                break;
-
-            case FollowMode.FollowNav:
-                followStrategy = followNav;
-                break;
-
-            case FollowMode.FollowPoint:
-                followStrategy = followPoint;
-                break;
+            followStrategy = followPoint;
         }
 
         //可着力的情况下，小男孩能走，能停。
         if ((boy.groundCheck.IsOnGround() || boy.isFloating))
         {
+            //获取目标位置
+            Vector3 pos;
+            if (mode == FollowMode.FollowPoint)
+            {
+                pos = targetPoint;
+            }
+            else if (mode == FollowMode.FollowTarget)
+            {
+                pos = targetTransfrom.position;
+            }
+            else
+            {
+                return;
+            }
+
+            //初始化目标位置
+            followStrategy.InitTargetPostion(pos);
+
             //是否到达
             if (arrived == false)
             {
-                //1.转身
-                AdjustDirection();
+                //调整朝向（调整朝向后，有2个选择：1.能移动则移动；2.不能移动则跳）
+                followStrategy.AdjustFacing();
 
                 //2.能移动
                 if (IsBoyMovable() && (dangerDct.passable || boy.isFloating))
@@ -123,6 +143,9 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
                     SetSpeed();
                     //跟随。
                     followStrategy.Follow();
+
+                    //是否抵达
+                    arrived = followStrategy.IsArrived();
                 }
                 else
                 {
@@ -137,10 +160,74 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
             //follow执行完成之后，可能会变成arrived==true;所以不能使用else.
             if (arrived)
             {
-                StayThereAndLookAtCat();
+                StayThere();
+                LookAtCat();
             }
         }
     }
+
+    //走到指定点
+    public void GotoPoint(Vector3 point)
+    {
+        arrived = false;
+        mode = FollowMode.FollowPoint;
+        targetPoint = point;
+    }
+
+    //跟随目标
+    public void FollowTarget(GameObject target)
+    {
+        arrived = false;
+        mode = FollowMode.FollowTarget;
+        targetTransfrom = target.transform;
+    }
+
+    //按向量移动（长度为向量长度）
+    public void MoveVector(Vector3 vec)
+    {
+        Vector3 pos = boy.transform.position + vec;
+        GotoPoint(pos);
+    }
+
+    //站定（停下，可以响应跟随指令）
+    public void StayThere()
+    {
+        arrived = true;
+        boy.moveProc.SetMoveByAI(0);
+        this.horSpeed = 0;
+    }
+
+    //2秒后看向猫
+    public void LookAtCat()
+    {
+        StartCoroutine(_LookAtCat());
+    }
+
+    //延迟面向猫
+    private IEnumerator _LookAtCat()
+    {
+        yield return new WaitForSeconds(2);
+        //静止时，自动面朝猫（1.5内不转身）
+        float disHor2 = Mathf.Abs(boy.transform.position.x - cat.transform.position.x);
+        if (disHor2 > 1.5f)
+        {
+            if (boy.transform.position.x > cat.transform.position.x)
+            {
+                boy.moveProc.TurnByOrder(4);
+            }
+            else
+            {
+                boy.moveProc.TurnByOrder(6);
+            }
+        }
+    }
+
+    //禁用跟随（不再响应跟随指令）
+    public void DisableFollow()
+    {
+        enableFollow = false;
+    }
+
 
     //设置速度
     void SetSpeed()
@@ -165,53 +252,6 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
         this.horSpeed = speed;
     }
 
-    //走到指定点
-    public void GotoPoint(Vector3 point)
-    {
-        followPoint.posTarget = point;
-        arrived = false;
-    }
-
-    //走到猫身边
-    public void GoToCat()
-    {
-        mode = FollowMode.FollowCat;
-        arrived = false;
-    }
-
-    public void StayThere()
-    {
-        arrived = true;
-        boy.moveProc.SetMoveByAI(0);
-        this.horSpeed = 0;
-    }
-
-    public void StayThereAndLookAtCat()
-    {
-        StayThere();
-        if (mode == FollowMode.FollowCat)
-        {
-            StartCoroutine(LookAtCat());
-        }
-    }
-
-    IEnumerator LookAtCat()
-    {
-        yield return new WaitForSeconds(2);
-        //静止时，自动面朝猫（1.5内不转身）
-        float disHor2 = Mathf.Abs(boy.transform.position.x - cat.transform.position.x);
-        if (disHor2 > 1.5f)
-        {
-            if (boy.transform.position.x > cat.transform.position.x)
-            {
-                boy.moveProc.TurnByOrder(4);
-            }
-            else
-            {
-                boy.moveProc.TurnByOrder(6);
-            }
-        }
-    }
 
     //面朝前进方向。
     bool AdjustDirection()
@@ -281,11 +321,11 @@ public class BoyAI : MonoBehaviour, GameManagerRoleListener
     }
 }
 
-
+//跟随方式
 public enum FollowMode
 {
-    FollowCat,
-    FollowNav,
+    NoFollow,
+    FollowTarget,
     FollowPoint
 }
 

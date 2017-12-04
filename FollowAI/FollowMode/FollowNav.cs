@@ -8,13 +8,16 @@ public class FollowNav : IFollowStrategy
 
     public BoyAI ai;
 
-    public PlayerControl cat;
+    //public PlayerControl cat;
 
     public BoyController boy;
 
-    public FollowNav(PlayerControl cat, BoyController boy, NavManage nav)
+    //目标位置
+    public Vector3 targetPos;
+
+    public FollowNav(BoyController boy, NavManage nav)
     {
-        this.cat = cat;
+        //this.cat = cat;
         this.boy = boy;
         ai = boy.GetComponent<BoyAI>();
         this.nav = nav;
@@ -22,22 +25,14 @@ public class FollowNav : IFollowStrategy
 
     public void Follow()
     {
-        float dis = RemainTotalDistance();
-        if (dis < ai.minDis)
+        //移动
+        if (Mathf.Abs(nav.pathList[1].x - nav.pathList[0].x) < 0.3f)
         {
-            ai.arrived = true;
+            boy.moveProc.SetMoveByAI(0);
         }
         else
         {
-            //移动
-            if (Mathf.Abs(nav.pathList[1].x - nav.pathList[0].x) < 0.3f)
-            {
-                boy.moveProc.SetMoveByAI(0);
-            }
-            else
-            {
-                boy.moveProc.SetMoveByAI(ai.speed);
-            }
+            boy.moveProc.SetMoveByAI(ai.speed);
         }
     }
 
@@ -52,9 +47,7 @@ public class FollowNav : IFollowStrategy
 
     public float RemainDistance()
     {
-        float dis = 0;
-        dis = Mathf.Abs(nav.pathList[1].x - nav.pathList[0].x);
-        return dis;
+        return Mathf.Abs(nav.pathList[1].x - nav.pathList[0].x);
     }
 
     //所有节点加起来的剩余距离
@@ -66,5 +59,20 @@ public class FollowNav : IFollowStrategy
             dis += Mathf.Abs(nav.pathList[i + 1].x - nav.pathList[i].x);
         }
         return dis;
+    }
+
+    public bool IsArrived()
+    {
+        return RemainTotalDistance() < ai.minDis;
+    }
+
+    public void AdjustFacing()
+    {
+        //throw new System.NotImplementedException();
+    }
+
+    public void InitTargetPostion(Vector3 position)
+    {
+        targetPos = position;
     }
 }

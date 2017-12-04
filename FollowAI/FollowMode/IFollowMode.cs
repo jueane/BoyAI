@@ -12,4 +12,14 @@ public interface IFollowStrategy
 
     //到终点的剩余距离
     float RemainDistance();
+
+
+    //指定目标位置
+    void InitTargetPostion(Vector3 position);
+
+    //是否到达
+    bool IsArrived();
+
+    //调整方向
+    void AdjustFacing();
 }

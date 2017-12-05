@@ -99,7 +99,7 @@ public class JumpDetector : MonoBehaviour
 
             float speedTmp = 1 - (1f / dctBodyArr.Length) * (i);
 
-            if (ai.IsFollowingRight())
+            if (ai.followStrategy.IsToRight())
             {
                 jdTemp.usedSpeed = speedTmp;
                 jdTemp.Jump(speedTmp);
@@ -110,7 +110,7 @@ public class JumpDetector : MonoBehaviour
                 jdTemp.Jump(-speedTmp);
             }
 
-            dctBodyArr[i] = jdTemp;            
+            dctBodyArr[i] = jdTemp;
         }
 
     }

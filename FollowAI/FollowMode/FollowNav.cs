@@ -36,6 +36,7 @@ public class FollowNav : IFollowStrategy
         }
     }
 
+    //将要移动的方向
     public bool IsToRight()
     {
         if (boy.transform.position.x <= nav.pathList[1].x)
@@ -64,11 +65,6 @@ public class FollowNav : IFollowStrategy
     public bool IsArrived()
     {
         return RemainTotalDistance() < ai.minDis;
-    }
-
-    public void AdjustFacing()
-    {
-        //throw new System.NotImplementedException();
     }
 
     public void InitTargetPostion(Vector3 position)

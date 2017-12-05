@@ -153,7 +153,7 @@ public class JumpDetectorBody : MonoBehaviour
         layerCollision = LayerMask.GetMask(LayerName.Ground, LayerName.Platform);
         layerGround = LayerMask.GetMask(LayerName.Ground);
     }
-    
+
     public void Jump(float speed)
     {
         wantJump = true;
@@ -223,7 +223,7 @@ public class JumpDetectorBody : MonoBehaviour
             NewClingWallTrigger cwt = c.GetComponent<NewClingWallTrigger>();
             if (cwt)
             {
-                if (cwt.IsRight == ai.IsFollowingRight())
+                if (cwt.IsRight == ai.followStrategy.IsToRight())
                 {
                     collideType = 3;
                     collideSecure = true;

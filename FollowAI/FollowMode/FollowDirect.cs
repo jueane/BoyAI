@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FollowPoint : IFollowStrategy
+public class FollowDirect : IFollowStrategy
 {
     public BoyAI ai;
 
@@ -13,7 +13,7 @@ public class FollowPoint : IFollowStrategy
     //目标位置
     public Vector3 targetPos;
 
-    public FollowPoint(BoyController boy)
+    public FollowDirect(BoyController boy)
     {
         //this.cat = cat;
         this.boy = boy;
@@ -37,19 +37,13 @@ public class FollowPoint : IFollowStrategy
 
     public float RemainDistance()
     {
-        float dis = Mathf.Abs(boy.transform.position.x - targetPos.x);
-        return dis;
+        return Mathf.Abs(boy.transform.position.x - targetPos.x);
     }
 
 
     public bool IsArrived()
     {
         return Mathf.Abs(boy.transform.position.x - targetPos.x) < ai.minDis;
-    }
-
-    public void AdjustFacing()
-    {
-        //throw new System.NotImplementedException();
     }
 
     public void InitTargetPostion(Vector3 position)

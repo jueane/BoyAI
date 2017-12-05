@@ -28,14 +28,18 @@ public class TooFarFollow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        timeElapse += Time.deltaTime;
-        if (timeElapse < interval)
+        //条件满足，则检测是否过远
+        if (ai.boy.UseAI && ai.enableFollow && ai.mode == FollowMode.FollowTarget && ai.arrived)
         {
-            return;
-        }
-        timeElapse = 0;
+            timeElapse += Time.deltaTime;
+            if (timeElapse < interval)
+            {
+                return;
+            }
+            timeElapse = 0;
 
-        Detect();
+            Detect();
+        }
     }
 
     //检测一次是否需要[过远跟随]
@@ -43,8 +47,8 @@ public class TooFarFollow : MonoBehaviour
     {
         if (Vector2.Distance(boy.position, cat.position) > minDis)
         {
-            ai.GoToCat();
-        }                
+            ai.FollowTarget(cat.gameObject);
+        }
     }
 
 }
